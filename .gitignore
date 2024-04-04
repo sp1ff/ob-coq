@@ -1,0 +1,10 @@
+*.in
+aclocal.m4
+autom4te.cache
+build-aux
+configure
+README
+*.tar.gz
+*.tar.xz
+*.tar.zst
+*.elc

@@ -1,0 +1,10 @@
+#+TITLE: Test Org Document
+#+DESCRIPTION: Org document used for testing purposes
+
+Set point to 199 to be inside the following code block:
+
+#+BEGIN_SRC coq :results output
+  Inductive bool : Set :=
+  | false
+  | true.
+#+END_SRC
