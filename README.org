@@ -2,7 +2,7 @@
 #+DESCRIPTION: README for ob-coq
 #+AUTHOR: Michael Herstine
 #+EMAIL: sp1ff@pobox.com
-#+DATE: <2024-04-04 Thu 15:10>
+#+DATE: <2024-04-09 Tue 15:40>
 #+AUTODATE: t
 #+STARTUP: overview
 
@@ -12,7 +12,7 @@ ob-coq provides [[https://orgmode.org/][Org]] [[https://orgmode.org/worg/org-con
 
 [[https://www.gnu.org/software/emacs/][Emacs]] [[https://orgmode.org/][Org Mode]] is a "major mode for keeping notes, authoring documents, computational notebooks, literate programming, maintaining to-do lists, planning projects, and more..." Like any other markup language, one can embed snippets of source code in Org Mode documents. Unlike other markup languges, however, Org Mode can evaluate those source blocks, passing them input from the Org Mode document itself, collecting their results, and passing _those_ on to other source blocks.
 
-[[https://orgmode.org/][Org Mode]] ships with support for many languages (C/C++, bash, awk & Python to name just a few). This package provides support for [[http://coq.inria.fr][Coq]], a proof assistant, which provides a dependently-typed functional programming language.
+[[https://orgmode.org/][Org Mode]] ships with support for many languages (C/C++, bash, awk & Python to name just a few). This package provides support for [[http://coq.inria.fr][Coq]], a proof assistant, which provides a dependently-typed functional programming language. As part of the implementation, it also provides =inf-coq=, a comint-based major mode for interacting with =coqtop= in an inferior process.
 * License
 
 This code is released under the [[https://www.gnu.org/licenses/gpl-3.0.en.html][GPL version 3]].

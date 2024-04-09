@@ -82,7 +82,24 @@
     map)
   "Keymap for `inf-coq' mode.")
 
-(defconst inf-coq-prompt-regexp "^Coq < "
+;; according to
+;; <https://coq.inria.fr/doc/V8.19.1/refman/language/core/basic.html?highlight=identifiers>
+;; Coq identifiers obey:
+
+;; ident ::= first-letter subsequent-letter*
+;; first-letter ::= [a-zA-Z_<unicode letter>
+;; subsequent-letter ::= first-letter digit ' <unicode id part>
+
+;; Huh. What's this Unicode business? unicode-letter "non-exhaustively
+;; includes Latin, Greek, Gothic, Cyrillic, Arabic, Hebrew, Georgian,
+;; Hangul, Hiragana and Katakana characters, CJK ideographs,
+;; mathematical letter-like symbols and non-breaking
+;; space. [unicoded-id-part] non-exhaustively includes symbols for prime
+;; letters and subscripts."
+
+;; Anyway, the Coq prompt changes. So far I've seen it change in response to
+;; stating a Theorem-- the prompt changes to the name which I'm defining.
+(defconst inf-coq-prompt-regexp "^[a-zA-Z_][a-zA-Z_0-9']* < "
   "Regular expression matching the Coq prompt.")
 
 (defvar inf-coq--output-alist nil
@@ -194,11 +211,15 @@ the results."
            (lambda (text)
              (inf-coq--preoutput-filter-function text session)))
           (comint-send-string proc text)
-          (let* ((value (cdr (assoc key inf-coq--output-alist))))
-            (while (not (car value))
+          (let* ((value (cdr (assoc key inf-coq--output-alist)))
+                 (count 0))
+            (while (and (not (car value)) (< count 10))
               (accept-process-output proc 0.1)
               (sit-for 0.1)
+              (setq count (1+ count))
               (setq value (cdr (assoc key inf-coq--output-alist))))
+            (if (eq 10 count)
+                (message "Warning: inf-coq timed-out waiting for a response."))
             (setq result (cdr value)))
           (setf (alist-get key inf-coq--output-alist nil nil 'equal) nil)
           (setf (alist-get key inf-coq--output-alist nil t 'equal) nil)
