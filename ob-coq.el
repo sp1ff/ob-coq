@@ -1,4 +1,4 @@
-;;; ob-coq.el --- org-babel functions for coq evaluation   -*- lexical-binding: t -*-
+;;; ob-coq.el --- Org Babel functions for coq evaluation   -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2024 Michael Herstine <sp1ff@pobox.com>
 
@@ -6,8 +6,8 @@
 ;; Created: 31 March 2024
 ;; Keywords: languages processes tools
 ;; Package: ob-coq
-;; Homepage: https://orgmode.org
-;; Package: ob-coq
+;; Package-Requires: ((emacs "26.1") (org "9.6"))
+;; Homepage: https://github.com/sp1ff/ob-coq
 ;; Version: 0.0.1
 
 ;; This file is not part of GNU Emacs.
@@ -46,7 +46,7 @@
 
 (require 'inf-coq)
 
-(defcustom org-babel-coq-command "coqtop"
+(defcustom ob-coq-coq-command "coqtop"
   "Name of the command for executing Coq code."
   :group 'org-babel
   :type 'string)
@@ -58,21 +58,24 @@
 (defvar org-babel-default-header-args:coq '())
 
 (defun org-babel-variable-assignments:coq (params)
-  "Return a list of Coq statements assigning the block's definitions."
+  "Return a list of Coq statements assigning the block's definitions.
+PARAMS are the source block's parameters."
   (mapcar
    (lambda (pair)
      (format "Definition %s := %s."
 	     (car pair)
-	     (org-babel-coq-var-to-coq (cdr pair))))
+	     (ob-coq--org-babel-var-to-coq (cdr pair))))
    (org-babel--get-vars params)))
 
-(defun org-babel-coq-var-to-coq (var)
-  "Convert an elisp var into a string of coq source code
-specifying a var of the same value."
+(defun ob-coq--org-babel-var-to-coq (var)
+  "Convert an elisp VAR into a string of Coq source code.
+The result should specify a var of the same value."
   (format "%S" var))
 
 (defun org-babel-execute:coq (body params)
-  "Execute a block of Coq code with org-babel.
+  "Execute a block of Coq code BODY with org-babel.
+PARAMS are the source block's parameters.
+
 This function is called by `org-babel-execute-src-block'"
   (message "Executing Coq source code block")
   (let* ((processed-params (org-babel-process-params params))
@@ -86,7 +89,7 @@ This function is called by `org-babel-execute-src-block'"
           (org-babel-expand-body:generic
             body params
             (org-babel-variable-assignments:coq params)))
-         (result (org-babel-coq-evaluate session full-body result-type
+         (result (ob-coq-evaluate session full-body result-type
                                          result-params)))
     (org-babel-reassemble-table
      result
@@ -95,15 +98,15 @@ This function is called by `org-babel-execute-src-block'"
      (org-babel-pick-name (cdr (assq :rowname-names params))
 			                    (cdr (assq :rownames params))))))
 
-(defun org-babel--strip-welcome (text)
+(defun ob-coq--strip-welcome (text)
   "Strip the Coq welcome message from TEXT, if present."
   (if (string-match "^Welcome to Coq [0-9]+\\.[0-9]+\\.[0-9]+\n" text)
       (substring text (match-end 0))
     text))
 
-(defun org-babel-coq-evaluate
+(defun ob-coq-evaluate
     (session body &optional result-type result-params _preamble)
-  "Evaluate BODY as Coq code."
+  "Evaluate BODY as Coq code in session SESSION."
 
   (let ((proc (inf-coq-process session)))
     (unless proc (inf-coq-run-coq session))
@@ -111,13 +114,13 @@ This function is called by `org-babel-execute-src-block'"
       (with-current-buffer (process-buffer (inf-coq-process session))
         ;; The buffer (and process) will be killed on completion, so no need to
         ;; remove later
-        (add-hook 'comint-preoutput-filter-functions #'org-babel--strip-welcome -99)))
+        (add-hook 'comint-preoutput-filter-functions #'ob-coq--strip-welcome -99)))
     (let ((result (inf-coq-send-string body session)))
       (unless session (inf-coq-quit))
       (let ((result
              (pcase (cdr result-type)
                (`output result)
-               (`value (error "Parsing Coq output as values not supported, yet.")))))
+               (`value (error "Parsing Coq output as values not supported, yet")))))
         (org-babel-result-cond (cdr result-params)
 	        result (when result (org-babel-script-escape result)))))))
 

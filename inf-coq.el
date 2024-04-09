@@ -5,7 +5,10 @@
 ;; Author: Michael Herstine <sp1ff@pobox.com>
 ;; Created: 31 March 2024
 ;; Keywords: languages processes tools
-;; Package: ob-coq
+;; Package: inf-coq
+;; Package-Requires: ((emacs "25.1") (org "9.6"))
+;; Homepage: https://github.com/sp1ff/ob-coq
+;; Version: 0.0.1
 
 ;; This file is not part of GNU Emacs.
 
@@ -24,12 +27,12 @@
 
 ;;; Commentary:
 
-;; Coq is a proof assistant (see <http://coq.inria.fr>). The interactive
-;; program with which one interacts is `coqtop`. This pacakge provides a
-;; command interpreter for `coqtop`. That is to say, it runs `coqtop` as an
+;; Coq is a proof assistant (see <http://coq.inria.fr>).  The interactive
+;; program with which one interacts is `coqtop`.  This pacakge provides a
+;; command interpreter for `coqtop`.  That is to say, it runs `coqtop` as an
 ;; inferior process and provides a major mode based on `comint' for interacting
-;; with it in the process' buffer. This is a minimal implementation
-;; purpose-built for use with `ob-coq'. For a more fullly featured Coq
+;; with it in the process' buffer.  This is a minimal implementation
+;; purpose-built for use with `ob-coq'.  For a more fullly featured Coq
 ;; interface under Emacs look at Proof General
 ;; (<http://zermelo.dcs.ed.ac.uk/~proofgen>).
 
@@ -49,7 +52,7 @@
 
 ;; The primary difference between this implementation and those of
 ;; inferior-coq.el and inf-haskell.el is that the latter two support one & only
-;; one process communicating with their respective interpreters. Given that
+;; one process communicating with their respective interpreters.  Given that
 ;; this implementation is designed to support an Org Babel backend for Coq, I
 ;; wanted to be able to support multiple sessions (that, and the fact that
 ;; Proof General can only support one sessoin at a time has annoyed me for some
@@ -82,7 +85,24 @@
     map)
   "Keymap for `inf-coq' mode.")
 
-(defconst inf-coq-prompt-regexp "^Coq < "
+;; according to
+;; <https://coq.inria.fr/doc/V8.19.1/refman/language/core/basic.html?highlight=identifiers>
+;; Coq identifiers obey:
+
+;; ident ::= first-letter subsequent-letter*
+;; first-letter ::= [a-zA-Z_<unicode letter>
+;; subsequent-letter ::= first-letter digit ' <unicode id part>
+
+;; Huh. What's this Unicode business? unicode-letter "non-exhaustively
+;; includes Latin, Greek, Gothic, Cyrillic, Arabic, Hebrew, Georgian,
+;; Hangul, Hiragana and Katakana characters, CJK ideographs,
+;; mathematical letter-like symbols and non-breaking
+;; space. [unicoded-id-part] non-exhaustively includes symbols for prime
+;; letters and subscripts."
+
+;; Anyway, the Coq prompt changes. So far I've seen it change in response to
+;; stating a Theorem-- the prompt changes to the name which I'm defining.
+(defconst inf-coq-prompt-regexp "^[a-zA-Z_][a-zA-Z_0-9']* < "
   "Regular expression matching the Coq prompt.")
 
 (defvar inf-coq--output-alist nil
@@ -96,11 +116,12 @@ We use the key \\='default-session for the nil session."
 
 (defun inf-coq--preoutput-filter-function (text &optional session)
   "Hook invoked before inserting TEXT into the output buffer.
+Optional SESSION names the particular session.
 
 `inf-coq' (ab)uses this to intercept output from commands sent via
 `inf-coq-send-string' and redirect it to `inf-coq--output-alist'.
 
-Nb. that this cannot be installed as a preoutput hook directly; it will
+Nb that this cannot be installed as a preoutput hook directly; it will
 need to be wrapped in a lambda to pass along the session."
 
   (let* ((last-line-was-solely-prompt)
@@ -132,8 +153,7 @@ need to be wrapped in a lambda to pass along the session."
   "Major mode for interacting with an inferior Coq process.
 
 The following commands are available:
-\\{inf-coq-mode-map}
-"
+\\{inf-coq-mode-map}"
   :group 'inf-coq
   (setq-local mode-line-process '(":%s")
               ;; make the Coq prompt read-only for purposes of line editing
@@ -194,11 +214,15 @@ the results."
            (lambda (text)
              (inf-coq--preoutput-filter-function text session)))
           (comint-send-string proc text)
-          (let* ((value (cdr (assoc key inf-coq--output-alist))))
-            (while (not (car value))
+          (let* ((value (cdr (assoc key inf-coq--output-alist)))
+                 (count 0))
+            (while (and (not (car value)) (< count 10))
               (accept-process-output proc 0.1)
               (sit-for 0.1)
+              (setq count (1+ count))
               (setq value (cdr (assoc key inf-coq--output-alist))))
+            (if (eq 10 count)
+                (message "Warning: inf-coq timed-out waiting for a response."))
             (setq result (cdr value)))
           (setf (alist-get key inf-coq--output-alist nil nil 'equal) nil)
           (setf (alist-get key inf-coq--output-alist nil t 'equal) nil)
