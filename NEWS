@@ -1,4 +1,13 @@
 ob-coq News -- history of user-visible changes           -*- outline -*-
 
+* 0.0.2 build
+
+** User-visible changes
+
+*** Update `inf-coq-prompt-regexp'
+*** Add an upper limit to the number of times `inf-coq-send-string' will poll for output
+
+...to avoid infinite loops.
+*** Add an Emacs package to the build
 * 0.0.1 build: initial release
 

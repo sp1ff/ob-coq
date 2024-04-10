@@ -2,7 +2,7 @@
 #+DESCRIPTION: README for ob-coq
 #+AUTHOR: Michael Herstine
 #+EMAIL: sp1ff@pobox.com
-#+DATE: <2024-04-09 Tue 15:40>
+#+DATE: <2024-04-09 Tue 17:23>
 #+AUTODATE: t
 #+STARTUP: overview
 
@@ -32,6 +32,16 @@ At present the package is only available as source:
   make check
   sudo make install
 #+END_SRC
+
+The build process _does_ make an Emacs package, so you can also do:
+
+#+BEGIN_SRC bash
+  # as above...
+  make check
+  make dist
+#+END_SRC
+
+to produce an Emacs package file (=ob-coq-0.0.2.tar=) which you can install with =package-install-file= in your Emacs.
 * Status & Roadmap
 
 This is first code, and I've tried to indicate that with the version number (0.0.x). At the time of this writing, it only supports collecting results as =output= (as opposed to =result=). This reflects what I see as the primary use case for ob-coq: building Coq developments in Org Mode rather than plain Coq (i.e. =.v=) files.

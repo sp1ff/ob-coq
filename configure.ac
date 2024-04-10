@@ -1,4 +1,4 @@
-AC_INIT([ob-coq], [0.0.1], [sp1ff@pobox.com])
+AC_INIT([ob-coq], [0.0.2], [sp1ff@pobox.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([./ob-coq.el])
 AM_INIT_AUTOMAKE([-Wall -Werror gnits std-options dist-xz dist-zstd])

@@ -1,3 +1,26 @@
+2024-04-09  Michael Herstine  <sp1ff@pobox.com>
+
+	Cutting release 0.0.2
+
+2024-04-09  Michael Herstine  <sp1ff@pobox.com>
+
+	Update `inf-coq-prompt-regexp'.
+	This commit does a few things:
+
+	    - Update `inf-coq-prompt-regexp' to reflect that the `coqtop`
+	      prompt changes (during proofs, e.g.)
+	    - Add an upper limit on the number of times `inf-coq-send-string`
+	      will poll the process for output (to prevent infinite loops)
+	    - Add an Emacs package to the build
+
+	Also, the source is now linted using:
+
+	    - checkdoc
+	    - package-lint
+
+	This commit also contains naming & docstring changes prompted by the
+	linters.
+
 2024-04-04  Michael Herstine  <sp1ff@pobox.com>
 
 	Initial commit of ob-coq.
