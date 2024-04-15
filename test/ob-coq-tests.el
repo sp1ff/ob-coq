@@ -62,7 +62,12 @@ negb is defined
      = false
      : bool
 
-"))))
+")))
+  ;; iss-01 "`inf-coq-quit' sometimes prompts interactively
+  (let ((inf-coq-process-shutdown-wait-time 0.0))
+    ;; This won't quite *fail* if this bug reappears, it'll just hang the test
+    ;; suite
+    (inf-coq-quit session)))
 
 (ert-deftest ob-coq-tests-babel-smoke ()
   "Smoke tests for ob-coq."

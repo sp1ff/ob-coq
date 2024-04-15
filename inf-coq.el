@@ -75,6 +75,11 @@
   :group 'inf-coq
   :type '(repeat string))
 
+(defcustom inf-coq-process-shutdown-wait-time 0.1
+  "Time, in seconds, to wait for coqtop process shutdown when closing buffers."
+  :group 'inf-coq
+  :type 'float)
+
 (defcustom inf-coq-mode-hook nil
   "Hook invoked on entry to inf-coq-mode."
   :group 'inf-coq
@@ -216,7 +221,8 @@ the results."
           (comint-send-string proc text)
           (let* ((value (cdr (assoc key inf-coq--output-alist)))
                  (count 0))
-            (while (and (not (car value)) (< count 10))
+            (while (and (or (< count 4) (not (car value)))
+                        (< count 10))
               (accept-process-output proc 0.1)
               (sit-for 0.1)
               (setq count (1+ count))
@@ -233,11 +239,13 @@ the results."
   "Quit the Coq process corresponding to SESSION."
   (with-current-buffer (inf-coq--buffer-for-session session)
     (let ((confirm-kill-processes nil))
+      (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)
       (comint-kill-subjob)
-      ;; We shouldn't be queried (due to the local binding above) even if we
+      ;; We shouldn't be queried (due to the local binding above and the
+      ;; clearing of the "query-on-exit" flag for the process) even if we
       ;; immediately kill the buffer, but still; give the process a change to
       ;; clean itself up.
-      (sit-for 0.1)
+      (sit-for inf-coq-process-shutdown-wait-time)
       (kill-buffer))))
 
 (provide 'inf-coq)
