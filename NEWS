@@ -1,5 +1,14 @@
 ob-coq News -- history of user-visible changes           -*- outline -*-
 
+* 0.0.4 build
+
+** Bugfixes
+
+*** Change the way in which `inf-coq-send-string' determines that output is complete
+** User-visible changes
+
+*** Change the default value for `ob-coq-prompt-regexp'
+*** Have `inf-coq-run-coq', when run interactively, change to the new comint buffer
 * 0.0.3 build
 
 ** Bugfixes

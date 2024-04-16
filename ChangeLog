@@ -1,3 +1,25 @@
+2024-04-16  Michael Herstine  <sp1ff@pobox.com>
+
+	Cut release 0.04
+
+2024-04-16  Michael Herstine  <sp1ff@pobox.com>
+
+	Change the default value for `inf-coq-prompt-regexp'...
+	This patch will take care of two small housekeeping items:
+
+	    - update the default setting for `inf-coq-prompt-regexp' to
+	      better conform to the Coq documents
+	    - have `inf-coq-run-coq', when called interactively, pop
+	      the new comint buffer to the foreground
+
+2024-04-16  Michael Herstine  <sp1ff@pobox.com>
+
+	Revamp the algorithm for detecting output is complete.
+	This patch changes the way in which `info-coq-send-string' detects
+	that output from the most recent text block has completed. It now
+	counts the number of periods ('.') in the input, and expects an
+	equal number of prompt instances back from the coqtop process.
+
 2024-04-15  Michael Herstine  <sp1ff@pobox.com>
 
 	Cutting build 0.0.3

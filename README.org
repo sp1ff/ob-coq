@@ -2,7 +2,7 @@
 #+DESCRIPTION: README for ob-coq
 #+AUTHOR: Michael Herstine
 #+EMAIL: sp1ff@pobox.com
-#+DATE: <2024-04-15 Mon 16:56>
+#+DATE: <2024-04-16 Tue 16:18>
 #+AUTODATE: t
 #+STARTUP: overview
 
@@ -12,7 +12,7 @@ ob-coq provides [[https://orgmode.org/][Org]] [[https://orgmode.org/worg/org-con
 
 [[https://www.gnu.org/software/emacs/][Emacs]] [[https://orgmode.org/][Org Mode]] is a "major mode for keeping notes, authoring documents, computational notebooks, literate programming, maintaining to-do lists, planning projects, and more..." Like any other markup language, one can embed snippets of source code in Org Mode documents. Unlike other markup languges, however, Org Mode can evaluate those source blocks, passing them input from the Org Mode document itself, collecting their results, and passing _those_ on to other source blocks.
 
-[[https://orgmode.org/][Org Mode]] ships with support for many languages (C/C++, bash, awk & Python to name just a few). This package provides support for [[http://coq.inria.fr][Coq]], a proof assistant, which provides a dependently-typed functional programming language. As part of the implementation, it also provides =inf-coq=, a comint-based major mode for interacting with =coqtop= in an inferior process.
+[[https://orgmode.org/][Org Mode]] ships with support for many languages (C/C++, bash, awk & Python to name just a few). This package provides support for [[http://coq.inria.fr][Coq]], a proof assistant that provides a dependently-typed functional programming language. As part of the implementation, it also provides =inf-coq=, a comint-based major mode for interacting with =coqtop= in an inferior process.
 * License
 
 This code is released under the [[https://www.gnu.org/licenses/gpl-3.0.en.html][GPL version 3]].
@@ -41,9 +41,13 @@ The build process _does_ make an Emacs package, so you can also do:
   make dist
 #+END_SRC
 
-to produce an Emacs package file (=ob-coq-0.0.3.tar=) which you can install with =package-install-file= in your Emacs.
+to produce an Emacs package file (=ob-coq-0.0.4.tar=) which you can install with =package-install-file= in your Emacs.
 * Status & Roadmap
 
-This is first code, and I've tried to indicate that with the version number (0.0.x). At the time of this writing, it only supports collecting results as =output= (as opposed to =result=). This reflects what I see as the primary use case for ob-coq: building Coq developments in Org Mode rather than plain Coq (i.e. =.v=) files.
+This is early code, something I've tried to indicate through the version number (0.0.x). At the time of this writing, it only supports collecting results as =output= (as opposed to =result=). This reflects what I see as the primary use case for ob-coq: building Coq developments in Org Mode rather than plain Coq (i.e. =.v=) files.
 
-I started this project because, as I'm learning Coq, I wanted to evaluate Coq source blocks in my Org files. I found an earlier [[https://git.sr.ht/~bzg/org-contrib/tree/master/item/lisp/ob-coq.el][ob-coq.el]] under [[https://git.sr.ht/~bzg/org-contrib/][org-contrib]] (along with an request for maintainers). It seems incomplete and it depends upon the file =coq-inferior.el= which used to be part of Coq, but was removed in 2018.
+Luc Pellissier maintained the original ob-coq under [[https://git.sr.ht/~bzg/org-contrib/][org-contrib]]. That implementation dependend upon =coq-inferior.el= which used to be part of Coq, but was removed in 2018.
+
+I'm using this package day-in & day-out while I learn Coq and am updating it as I find issues or missing features. Immediate next steps include building-out support for more Org Babel headers as well as hosting tarballs on my personal [[https://www.unwoundstack.com][site]]. When it matures a bit I'd like to submit it to MELPA. Documentation also needs to be written.
+
+In the meantime, bugs, feature requests & complaints are welcome in the [[https://github.com/sp1ff/ob-coq/issues][issues]], via [[mailto:sp1ff@pobox.com][e-mail]] or on IRC (I'm =sp1ff= on Libera.chat, where you can find me in the obvious places such as #emacs or #org-mode).
