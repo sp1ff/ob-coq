@@ -48,6 +48,7 @@ match x with
 | false => true
 | true => false
 end.
+Print negb.
 Compute negb true.
 " session)))
     (message "results: %s" results)
@@ -58,6 +59,15 @@ bool_rec is defined
 bool_sind is defined
 
 negb is defined
+
+negb =
+fun x : bool => match x with
+                | false => true
+                | true => false
+                end
+     : bool -> bool
+
+Arguments negb x
 
      = false
      : bool

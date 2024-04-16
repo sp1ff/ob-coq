@@ -59,6 +59,7 @@
 ;; time).
 
 ;;; Code:
+(require 'cl-lib)
 (require 'comint)
 
 (defgroup inf-coq nil
@@ -81,7 +82,7 @@
   :type 'float)
 
 (defcustom inf-coq-mode-hook nil
-  "Hook invoked on entry to inf-coq-mode."
+  "Hook invoked on entry to `inf-coq-mode'."
   :group 'inf-coq
   :type 'hook)
 
@@ -98,18 +99,25 @@
 ;; first-letter ::= [a-zA-Z_<unicode letter>
 ;; subsequent-letter ::= first-letter digit ' <unicode id part>
 
-;; Huh. What's this Unicode business? unicode-letter "non-exhaustively
-;; includes Latin, Greek, Gothic, Cyrillic, Arabic, Hebrew, Georgian,
-;; Hangul, Hiragana and Katakana characters, CJK ideographs,
-;; mathematical letter-like symbols and non-breaking
+;; I'm not sure what is meant by a "unicode letter"; the docs go on to say:
+;; unicode-letter "non-exhaustively includes Latin, Greek, Gothic, Cyrillic,
+;; Arabic, Hebrew, Georgian, Hangul, Hiragana and Katakana characters, CJK
+;; ideographs, mathematical letter-like symbols and non-breaking
 ;; space. [unicoded-id-part] non-exhaustively includes symbols for prime
 ;; letters and subscripts."
 
-;; Anyway, the Coq prompt changes. So far I've seen it change in response to
-;; stating a Theorem-- the prompt changes to the name which I'm defining.
+;; I'm not sure how, precisely to map that to a regexp.  Furthermore, the Coq
+;; prompt changes. So far I've seen it change in response to stating a
+;; Theorem-- the prompt changes to the name which I'm defining.
 (defconst inf-coq-prompt-regexp "^[a-zA-Z_][a-zA-Z_0-9']* < "
   "Regular expression matching the Coq prompt.")
 
+;; Coq output will, in general, arrive asynchronously in chunks. This variable
+;; tracks each session's output. The value associated with each session
+;; identifier is a cons cell, the second element of which is the concatenated
+;; text received so far (with prompts removed). The first is the number of
+;; "bare" prompts seen so far-- when this reaches zero, we know we've received
+;; all the output from the most recent text block.
 (defvar inf-coq--output-alist nil
   "Association list mapping sessions to most recent output.")
 
@@ -129,26 +137,24 @@ Optional SESSION names the particular session.
 Nb that this cannot be installed as a preoutput hook directly; it will
 need to be wrapped in a lambda to pass along the session."
 
-  (let* ((last-line-was-solely-prompt)
+  (let* ((prompts-seen 0)
          (key (inf-coq--map-session-internal session))
          (lines (cl-mapcar
 		             (lambda (line)
 			             ;; `line' could begin with multiple copies matching
 			             ;; `inf-coq-prompt-regexp'...
-                   (let ((saw-prompt 0))
-			               (while (string-match inf-coq-prompt-regexp line)
-			                 (setq saw-prompt (1+ saw-prompt)
+                   (while (string-match inf-coq-prompt-regexp line)
+			                 (setq prompts-seen (1+ prompts-seen)
                              line (substring line (match-end 0))))
-                     (setq
-                      last-line-was-solely-prompt
-                      (and (eq 1 saw-prompt) (eq 0 (length line)))))
 			             line)
 		             (split-string text "\n")))
          (current-state (cdr (assoc key inf-coq--output-alist)))
-         (new-text (mapconcat #'identity lines "\n")))
+         (num-dots (cadr (assoc key inf-coq--output-alist)))
+         (new-text (mapconcat #'identity lines "\n"))
+         (new-num-dots (- num-dots prompts-seen)))
     (setq current-state
           (cons
-           last-line-was-solely-prompt
+           new-num-dots
            (if current-state (concat (cdr current-state) new-text) new-text)))
     (setf (alist-get key inf-coq--output-alist nil nil 'equal) current-state)
     ;; Return the empty string, so that nothing will be inserted into the buffer
@@ -207,33 +213,32 @@ This method will call the inferior Coq process directly, \"bypassing\"
 the comint buffer: no input will be inserted into the buffer, nor will
 the results."
 
-  (let ((text (if (string-suffix-p "\n" text) text (concat text "\n"))))
-    (with-local-quit
-      (let* ((comint-preoutput-filter-functions-orig comint-preoutput-filter-functions)
-             (proc (inf-coq-process session))
-             (key (inf-coq--map-session-internal session))
-             (result))
-        (with-current-buffer (process-buffer proc)
-          (add-hook
-           'comint-preoutput-filter-functions
-           (lambda (text)
-             (inf-coq--preoutput-filter-function text session)))
-          (comint-send-string proc text)
-          (let* ((value (cdr (assoc key inf-coq--output-alist)))
-                 (count 0))
-            (while (and (or (< count 4) (not (car value)))
-                        (< count 10))
-              (accept-process-output proc 0.1)
-              (sit-for 0.1)
-              (setq count (1+ count))
-              (setq value (cdr (assoc key inf-coq--output-alist))))
-            (if (eq 10 count)
-                (message "Warning: inf-coq timed-out waiting for a response."))
-            (setq result (cdr value)))
-          (setf (alist-get key inf-coq--output-alist nil nil 'equal) nil)
-          (setf (alist-get key inf-coq--output-alist nil t 'equal) nil)
-          (setq comint-preoutput-filter-functions comint-preoutput-filter-functions-orig)
-          result)))))
+  (let ((num-dots (cl-count ?. text)))
+    (unless (> num-dots 0)
+      (error "The input is not a sentence in the vernacular; it will produce no output"))
+    (let ((text (if (string-suffix-p "\n" text) text (concat text "\n"))))
+      (with-local-quit
+        (let* ((comint-preoutput-filter-functions-orig comint-preoutput-filter-functions)
+               (proc (inf-coq-process session))
+               (key (inf-coq--map-session-internal session))
+               (result))
+          (setf (alist-get key inf-coq--output-alist nil nil 'equal) (cons num-dots ""))
+          (with-current-buffer (process-buffer proc)
+            (add-hook
+             'comint-preoutput-filter-functions
+             (lambda (text)
+               (inf-coq--preoutput-filter-function text session)))
+            (comint-send-string proc text)
+            (let* ((value (cdr (assoc key inf-coq--output-alist))))
+              (while (> (car value) 0)
+                (accept-process-output proc 0.1)
+                (sit-for 0.1)
+                (setq value (cdr (assoc key inf-coq--output-alist))))
+              (setq result (cdr value)))
+            (setf (alist-get key inf-coq--output-alist nil nil 'equal) nil)
+            (setf (alist-get key inf-coq--output-alist nil t 'equal) nil)
+            (setq comint-preoutput-filter-functions comint-preoutput-filter-functions-orig)
+            result))))))
 
 (defun inf-coq-quit (&optional session)
   "Quit the Coq process corresponding to SESSION."
@@ -243,7 +248,7 @@ the results."
       (comint-kill-subjob)
       ;; We shouldn't be queried (due to the local binding above and the
       ;; clearing of the "query-on-exit" flag for the process) even if we
-      ;; immediately kill the buffer, but still; give the process a change to
+      ;; immediately kill the buffer, but still; give the process a chance to
       ;; clean itself up.
       (sit-for inf-coq-process-shutdown-wait-time)
       (kill-buffer))))
