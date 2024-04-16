@@ -91,7 +91,7 @@
     map)
   "Keymap for `inf-coq' mode.")
 
-;; according to
+;; According to
 ;; <https://coq.inria.fr/doc/V8.19.1/refman/language/core/basic.html?highlight=identifiers>
 ;; Coq identifiers obey:
 
@@ -99,17 +99,17 @@
 ;; first-letter ::= [a-zA-Z_<unicode letter>
 ;; subsequent-letter ::= first-letter digit ' <unicode id part>
 
-;; I'm not sure what is meant by a "unicode letter"; the docs go on to say:
-;; unicode-letter "non-exhaustively includes Latin, Greek, Gothic, Cyrillic,
-;; Arabic, Hebrew, Georgian, Hangul, Hiragana and Katakana characters, CJK
-;; ideographs, mathematical letter-like symbols and non-breaking
-;; space. [unicoded-id-part] non-exhaustively includes symbols for prime
-;; letters and subscripts."
+;; I'm not sure what is meant by a "unicode letter" or a "unicode id part"; the
+;; docs go on to say: unicode-letter "non-exhaustively includes Latin, Greek,
+;; Gothic, Cyrillic, Arabic, Hebrew, Georgian, Hangul, Hiragana and Katakana
+;; characters, CJK ideographs, mathematical letter-like symbols and
+;; non-breaking space. [unicoded-id-part] non-exhaustively includes symbols for
+;; prime letters and subscripts."
 
-;; I'm not sure how, precisely to map that to a regexp.  Furthermore, the Coq
+;; I'm not sure how, precisely to map that to a regexp.  Note also that the Coq
 ;; prompt changes. So far I've seen it change in response to stating a
 ;; Theorem-- the prompt changes to the name which I'm defining.
-(defconst inf-coq-prompt-regexp "^[a-zA-Z_][a-zA-Z_0-9']* < "
+(defconst inf-coq-prompt-regexp "\\b[^0-9[:space:]][^[:space:]]* < "
   "Regular expression matching the Coq prompt.")
 
 ;; Coq output will, in general, arrive asynchronously in chunks. This variable
@@ -144,8 +144,8 @@ need to be wrapped in a lambda to pass along the session."
 			             ;; `line' could begin with multiple copies matching
 			             ;; `inf-coq-prompt-regexp'...
                    (while (string-match inf-coq-prompt-regexp line)
-			                 (setq prompts-seen (1+ prompts-seen)
-                             line (substring line (match-end 0))))
+			               (setq prompts-seen (1+ prompts-seen)
+                           line (substring line (match-end 0))))
 			             line)
 		             (split-string text "\n")))
          (current-state (cdr (assoc key inf-coq--output-alist)))
@@ -199,7 +199,9 @@ buffer base name with asterisks (i.e. make it suitable for use with
                 (apply
                  #'make-comint buffer-name inf-coq-program-name nil inf-coq-program-args))))
           (with-current-buffer buffer
-            (inf-coq-mode))))))
+            (inf-coq-mode))))
+    (if (called-interactively-p 'any)
+      (switch-to-buffer (concat "*" buffer-name "*")))))
 
 (defun inf-coq-process (&optional session)
   "Return the process object associated with SESSION.
