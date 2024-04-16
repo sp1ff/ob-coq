@@ -1,5 +1,10 @@
 ob-coq News -- history of user-visible changes           -*- outline -*-
 
+* 0.0.3 build
+
+** Bugfixes
+
+*** Fix #1: `inf-coq-quit' sometimes prompts
 * 0.0.2 build
 
 ** User-visible changes

@@ -1,3 +1,20 @@
+2024-04-15  Michael Herstine  <sp1ff@pobox.com>
+
+	Cutting build 0.0.3
+
+2024-04-15  Michael Herstine  <sp1ff@pobox.com>
+
+	[#1] Stop `inf-coq-quit' from prompting.
+	When `kill-buffer' is invoked, the hook `kill-buffer-query-functions'
+	is run. By default, one function in that hook is
+	`process-kill-buffer-query-function' which will, if the buffer has
+	an active process, prompt "Buffer NAME has a running process; kill
+	it?".
+
+	This patch short-circuits that by setting the coqtop process'
+	"query-on-exit-flag" to nil before killing the `inf-coq' comint
+	buffer.
+
 2024-04-09  Michael Herstine  <sp1ff@pobox.com>
 
 	Cutting release 0.0.2

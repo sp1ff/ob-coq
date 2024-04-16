@@ -5,3 +5,6 @@ the Coq theorem prover.
 
 Thank you to Carsten Dominik, Bastien Guerry and all the contributors
 to Org Mode.
+
+Thanks to Luc Pellissier <luc.pellissier@crans.org>, the maintainer of
+the original ob-coq.el.
