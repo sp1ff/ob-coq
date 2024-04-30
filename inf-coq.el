@@ -109,7 +109,7 @@
 ;; I'm not sure how, precisely to map that to a regexp.  Note also that the Coq
 ;; prompt changes. So far I've seen it change in response to stating a
 ;; Theorem-- the prompt changes to the name which I'm defining.
-(defconst inf-coq-prompt-regexp "\\b[^0-9[:space:]][^[:space:]]* < "
+(defconst inf-coq-prompt-regexp "^[^0-9[:space:]][^[:space:]]* < "
   "Regular expression matching the Coq prompt.")
 
 ;; Coq output will, in general, arrive asynchronously in chunks. This variable

@@ -94,7 +94,8 @@ Arguments negb x
       (goto-char 199)
       (org-ctrl-c-ctrl-c)
       (goto-char 229)
-      (should (looking-at "#\\+RESULTS:
+      (should
+       (looking-at "#\\+RESULTS:
 : 
 : bool is defined
 : bool_rect is defined
@@ -102,6 +103,41 @@ Arguments negb x
 : bool_rec is defined
 : bool_sind is defined
 :")))))
+
+(ert-deftest ob-coq-tests-issue-2 ()
+  "Regression test for Github issue #2 (Truncated output)"
+
+  ;; Write `test-doc.org` to a temporary buffer (because simply opening it via
+  ;; `find-file' on a read-only filesystem will leave the buffer in read-only
+  ;; mode and source code evaluation will fail.
+  (let* ((buffer (find-file (concat (getenv "srcdir") "/test-doc.org")))
+         (text (with-current-buffer buffer (buffer-string)))
+         (org-confirm-babel-evaluate nil))
+    (with-temp-buffer
+      (insert text)
+      (org-mode)
+      (goto-char 263)
+      (org-ctrl-c-ctrl-c)
+      (goto-char 318)
+      (message "the buffer: %s" (buffer-string))
+      (should
+       (looking-at "#\\+RESULTS:
+#\\+begin_example
+
+\\[Loading ML file ring_plugin\\.cmxs (using legacy method) \\.\\.\\. done\\]
+\\[Loading ML file zify_plugin\\.cmxs (using legacy method) \\.\\.\\. done\\]
+\\[Loading ML file micromega_plugin\\.cmxs (using legacy method) \\.\\.\\. done\\]
+\\[Loading ML file btauto_plugin\\.cmxs (using legacy method) \\.\\.\\. done\\]
+
+Z_lt_ge_dec =
+fun x y : Z => Z_lt_dec x y
+     : forall x y : Z, {(x < y)%Z} \\+ {(x >= y)%Z}
+
+Arguments Z_lt_ge_dec (x y)%Z_scope
+
+#\\+end_example
+"
+)))))
 
 (provide 'ob-coq-tests)
 
