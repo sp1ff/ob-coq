@@ -1,27 +1,36 @@
 ob-coq News -- history of user-visible changes           -*- outline -*-
 
-* 0.0.4 build
+* 0.0 builds
 
-** Bugfixes
+** 0.0.5 build
 
-*** Change the way in which `inf-coq-send-string' determines that output is complete
+*** Bugfixes
+
+**** Fix #2: Fix inf-coq-prompt-regexp
+
+Replace "\\b" with "^" at the start of the regexp.
+** 0.0.4 build
+
+*** Bugfixes
+
+**** Change the way in which `inf-coq-send-string' determines that output is complete
 ** User-visible changes
 
-*** Change the default value for `ob-coq-prompt-regexp'
-*** Have `inf-coq-run-coq', when run interactively, change to the new comint buffer
-* 0.0.3 build
+**** Change the default value for `ob-coq-prompt-regexp'
+**** Have `inf-coq-run-coq', when run interactively, change to the new comint buffer
+** 0.0.3 build
 
-** Bugfixes
+*** Bugfixes
 
-*** Fix #1: `inf-coq-quit' sometimes prompts
-* 0.0.2 build
+**** Fix #1: `inf-coq-quit' sometimes prompts
+** 0.0.2 build
 
-** User-visible changes
+*** User-visible changes
 
-*** Update `inf-coq-prompt-regexp'
-*** Add an upper limit to the number of times `inf-coq-send-string' will poll for output
+**** Update `inf-coq-prompt-regexp'
+**** Add an upper limit to the number of times `inf-coq-send-string' will poll for output
 
 ...to avoid infinite loops.
-*** Add an Emacs package to the build
-* 0.0.1 build: initial release
+**** Add an Emacs package to the build
+** 0.0.1 build: initial release
 

@@ -1,6 +1,22 @@
+2024-04-30  Michael Herstine  <sp1ff@pobox.com>
+
+	Cutting release 0.0.5
+
+2024-04-30  Michael Herstine  <sp1ff@pobox.com>
+
+	Fix `inf-coq-prompt-regexp'.
+	Prior to this patch, `inf-coq-prompt-regexp' began with "\\b", which
+	matches the empty string at the start of a word. This regrettably
+	would match any line with a '>' character in it, causing the output
+	of Coq evaluation to be extremely confusing.
+
+	This patch changes the "\\b" to "^", meaning that the text must
+	begin at the start of the line. `coqtop` seems to indent intermediate
+	output, perhaps for this very reason.
+
 2024-04-16  Michael Herstine  <sp1ff@pobox.com>
 
-	Cut release 0.04
+	Cut release 0.0.4
 
 2024-04-16  Michael Herstine  <sp1ff@pobox.com>
 
