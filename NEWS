@@ -2,6 +2,18 @@ ob-coq News -- history of user-visible changes           -*- outline -*-
 
 * 0.0 builds
 
+** 0.0.7 build
+
+*** User-visible changes
+
+**** Coalesce blank lines
+
+Introduce `inf-coq-coalesce-blank-lines'; if set to t, merge multiple successive
+blank lines into one in the output of `inf-coq-send-string'.
+**** Remove informational lines
+
+Introduce `inf-coq-elide-informational-lines; if set to t, remove lines that
+appear to be informational the output of `inf-coq-send-string'.
 ** 0.0.6 build
 
 *** Bugfixes

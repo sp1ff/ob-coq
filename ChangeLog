@@ -1,5 +1,22 @@
 2024-06-18  Michael Herstine  <sp1ff@pobox.com>
 
+	Cutting 0.0.7
+
+2024-06-18  Michael Herstine  <sp1ff@pobox.com>
+
+	Add the options to coalesce blank lines & elide informational lines.
+	This commit adds two new options governing the output of
+	`inf-coq-send-string':
+
+	    1) `inf-coq-coalesce-blank-lines': if set to t, multiple blank
+	       lines will be coalesced into one
+	    2) `inf-coq-elide-informational-lines': if set to t, remove
+	       lines that appear to be informational (such as
+	       "[Loading ML file ring_plugin.cmxs (using legacy method)
+	       ... done]"
+
+2024-06-18  Michael Herstine  <sp1ff@pobox.com>
+
 	Cutting 0.0.6
 
 2024-06-18  Michael Herstine  <sp1ff@pobox.com>
