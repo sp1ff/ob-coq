@@ -36,6 +36,21 @@
   (should (equal "*inf-coq-foo*" (inf-coq--buffer-for-session "foo")))
   (should (equal "inf-coq-foo" (inf-coq--buffer-for-session "foo" t)))
 
+  (should
+   (equal
+    "This is a line.
+
+Here is another."
+    (inf-coq--coalesce-blank-lines "
+This is a line.
+
+
+
+Here is another.
+
+
+")))
+
   (defconst session "ob-coq-tests-inf-coq")
 
   (inf-coq-run-coq session)
@@ -70,9 +85,7 @@ fun x : bool => match x with
 Arguments negb x
 
      = false
-     : bool
-
-")))
+     : bool")))
   ;; iss-01 "`inf-coq-quit' sometimes prompts interactively
   (let ((inf-coq-process-shutdown-wait-time 0.0))
     ;; This won't quite *fail* if this bug reappears, it'll just hang the test
@@ -94,15 +107,15 @@ Arguments negb x
       (goto-char 199)
       (org-ctrl-c-ctrl-c)
       (goto-char 229)
+      (message "Looking at: ``%s''." (buffer-substring (point) (+ (point) 24)))
       (should
        (looking-at "#\\+RESULTS:
-: 
 : bool is defined
 : bool_rect is defined
 : bool_ind is defined
 : bool_rec is defined
 : bool_sind is defined
-:")))))
+")))))
 
 (ert-deftest ob-coq-tests-issue-2 ()
   "Regression test for Github issue #2 (Truncated output)"
@@ -119,23 +132,17 @@ Arguments negb x
       (goto-char 263)
       (org-ctrl-c-ctrl-c)
       (goto-char 318)
+      (message "Looking at: ``%s''." (buffer-substring (point) (point-max)))
       (should
        (looking-at "#\\+RESULTS:
-#\\+begin_example
-
-\\[Loading ML file ring_plugin\\.cmxs (using legacy method) \\.\\.\\. done\\]
-\\[Loading ML file zify_plugin\\.cmxs (using legacy method) \\.\\.\\. done\\]
-\\[Loading ML file micromega_plugin\\.cmxs (using legacy method) \\.\\.\\. done\\]
-\\[Loading ML file btauto_plugin\\.cmxs (using legacy method) \\.\\.\\. done\\]
-
-Z_lt_ge_dec =
-fun x y : Z => Z_lt_dec x y
-     : forall x y : Z, {(x < y)%Z} \\+ {(x >= y)%Z}
-
-Arguments Z_lt_ge_dec (x y)%Z_scope
-
-#\\+end_example
+: Z_lt_ge_dec =
+: fun x y : Z => Z_lt_dec x y
+: *: forall x y : Z, {(x < y)%Z} \\+ {(x >= y)%Z}
+: *
+: Arguments Z_lt_ge_dec (x y)%Z_scope
 ")))))
+
+
 
 (ert-deftest ob-coq-tests-blog-post ()
   "Investigate an issue I found while writing a blog post."
@@ -152,10 +159,9 @@ Arguments Z_lt_ge_dec (x y)%Z_scope
       (goto-char 213)
       (org-ctrl-c-ctrl-c)
       (goto-char 290)
+      (message "Looking at: ``%s''." (buffer-substring (point) (+ (point) 24)))
       (should
        (looking-at "#\\+RESULTS:
-: 
-: 
 : Option is defined
 : Option_rect is defined
 : Option_ind is defined
@@ -163,7 +169,8 @@ Arguments Z_lt_ge_dec (x y)%Z_scope
 : Option_sind is defined"))
       (goto-char 722)
       (org-ctrl-c-ctrl-c)
-      (goto-char 752)
+      (goto-char 743)
+      (message "Looking at: ``%s''." (buffer-substring (point) (+ (point) 256)))
       (should
        (looking-at "#\\+RESULTS:
 #\\+begin_example
@@ -177,13 +184,11 @@ Arguments Z_lt_ge_dec (x y)%Z_scope
   x : Option
   ============================
   Fail <> Fail -> bool
- *
-#\\+end_example
-"))
+#\\+end_example"))
       (goto-char 1028)
       (org-ctrl-c-ctrl-c)
-      (goto-char 1096)
-      (message "Looking at: %s" (buffer-substring (point) (+ (point) 32)))
+      (goto-char 1086)
+      (message "Looking at: %s" (buffer-substring (point) (+ (point) 312)))
       (should
        (looking-at "#\\+RESULTS:
 #\\+begin_example
@@ -212,10 +217,7 @@ goal 2 is:
   Fail = Fail
  *
 No more goals.
- *
- *
-#\\+end_example
-")))))
+#\\+end_example")))))
 
 (provide 'ob-coq-tests)
 

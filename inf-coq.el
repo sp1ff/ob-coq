@@ -86,6 +86,16 @@
   :group 'inf-coq
   :type 'hook)
 
+(defcustom inf-coq-coalesce-blank-lines t
+  "Set to nil to not coalesce blank lines in `inf-coq-send-string'."
+  :group 'inf-coq
+  :type 'boolean)
+
+(defcustom inf-coq-elide-informational-lines t
+  "Set to nil to not remove informational lines in `inf-coq-send-string'."
+  :group 'inf-coq
+  :type 'boolean)
+
 (defvar inf-coq-mode-map
   (let ((map (nconc (make-sparse-keymap) comint-mode-map)))
     map)
@@ -211,6 +221,36 @@ buffer base name with asterisks (i.e. make it suitable for use with
 Return nil if there is none."
   (get-buffer-process (inf-coq--buffer-for-session session)))
 
+(defun inf-coq--coalesce-blank-lines (text)
+  "Coalesce any blank lines in TEXT.
+Also, remove leading & trailing blank lines."
+  (let ((lines (string-split text "\n"))
+        (cpy)
+	      (saw-empty))
+    (while lines
+      (let* ((line (car lines))
+	           (line-empty? (string-empty-p line)))
+	      (cond
+	       ((and saw-empty (not line-empty?))
+	        (setq saw-empty nil)
+	        (unless (seq-empty-p cpy)
+	          (setq cpy (cons "" cpy)))
+	        (setq cpy (cons line cpy)))
+	       ((and (not saw-empty) line-empty?)
+	        (setq saw-empty t))
+	       ((and (not saw-empty) (not line-empty?))
+	        (setq cpy (cons line cpy)))))
+      (setq lines (cdr lines)))
+    (string-join (reverse cpy) "\n")))
+
+(defun inf-coq--elide-informational-lines (text)
+  "Remove any informational lines in TEXT."
+  (string-join
+          (cl-delete-if
+           (lambda (line) (string-match "^\\s-*\\[[^]]*\\]\\s-*$" line))
+           (string-split text "\n"))
+          "\n"))
+
 (defun inf-coq-send-string (text &optional session)
   "Send TEXT to the Coq process associated with SESSION & collect the response.
 
@@ -228,7 +268,9 @@ the results."
                  (proc (inf-coq-process session))
                  (key (inf-coq--map-session-internal session))
                  (result))
-            (setf (alist-get key inf-coq--output-alist nil nil 'equal) (cons num-newlines ""))
+            (setf
+             (alist-get key inf-coq--output-alist nil nil 'equal)
+             (cons num-newlines ""))
             (with-current-buffer (process-buffer proc)
               (add-hook
                'comint-preoutput-filter-functions
@@ -244,7 +286,15 @@ the results."
               (setf (alist-get key inf-coq--output-alist nil nil 'equal) nil)
               (setf (alist-get key inf-coq--output-alist nil t 'equal) nil)
               (setq comint-preoutput-filter-functions comint-preoutput-filter-functions-orig)
-              result)))))))
+              (let* ((result
+                      (if inf-coq-elide-informational-lines
+                          (inf-coq--elide-informational-lines result)
+                        result))
+                     (result
+                      (if inf-coq-coalesce-blank-lines
+                          (inf-coq--coalesce-blank-lines result)
+                        result)))
+                result))))))))
 
 (defun inf-coq-quit (&optional session)
   "Quit the Coq process corresponding to SESSION."
