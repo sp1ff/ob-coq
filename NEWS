@@ -2,6 +2,11 @@ ob-coq News -- history of user-visible changes           -*- outline -*-
 
 * 0.0 builds
 
+** 0.0.6 build
+
+*** Bugfixes
+
+**** Count newlines in input rather than periods
 ** 0.0.5 build
 
 *** Bugfixes

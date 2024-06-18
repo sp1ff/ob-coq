@@ -1,3 +1,19 @@
+2024-06-18  Michael Herstine  <sp1ff@pobox.com>
+
+	Cutting 0.0.6
+
+2024-06-18  Michael Herstine  <sp1ff@pobox.com>
+
+	Change the way in which complete input is detected.
+	This commit once again changes the way in which `info-coq-send-string'
+	detects that output from the most recent text block has completed. It
+	now counts the number of newlines ('\n') in the input, and expects an
+	equal number of prompt instances back from the coqtop process.
+
+	In a breach of the "one commit per concern" rule of thumb, I've
+	also added some supporting scripts and the first Github action for
+	this repo.
+
 2024-04-30  Michael Herstine  <sp1ff@pobox.com>
 
 	Cutting release 0.0.5
