@@ -37,6 +37,7 @@
   (should (equal "inf-coq-foo" (inf-coq--buffer-for-session "foo" t)))
 
   (defconst session "ob-coq-tests-inf-coq")
+
   (inf-coq-run-coq session)
   (sit-for 0.1)
   (let ((results
@@ -51,7 +52,6 @@ end.
 Print negb.
 Compute negb true.
 " session)))
-    (message "results: %s" results)
     (should (equal results "bool is defined
 bool_rect is defined
 bool_ind is defined
@@ -85,7 +85,7 @@ Arguments negb x
   ;; Write `test-doc.org` to a temporary buffer (because simply opening it via
   ;; `find-file' on a read-only filesystem will leave the buffer in read-only
   ;; mode and source code evaluation will fail.
-  (let* ((buffer (find-file (concat (getenv "srcdir") "/test-doc.org")))
+  (let* ((buffer (find-file (concat (getenv "srcdir") "/corpus/test-doc.org")))
          (text (with-current-buffer buffer (buffer-string)))
          (org-confirm-babel-evaluate nil))
     (with-temp-buffer
@@ -110,7 +110,7 @@ Arguments negb x
   ;; Write `test-doc.org` to a temporary buffer (because simply opening it via
   ;; `find-file' on a read-only filesystem will leave the buffer in read-only
   ;; mode and source code evaluation will fail.
-  (let* ((buffer (find-file (concat (getenv "srcdir") "/test-doc.org")))
+  (let* ((buffer (find-file (concat (getenv "srcdir") "/corpus/test-doc.org")))
          (text (with-current-buffer buffer (buffer-string)))
          (org-confirm-babel-evaluate nil))
     (with-temp-buffer
@@ -119,7 +119,6 @@ Arguments negb x
       (goto-char 263)
       (org-ctrl-c-ctrl-c)
       (goto-char 318)
-      (message "the buffer: %s" (buffer-string))
       (should
        (looking-at "#\\+RESULTS:
 #\\+begin_example
@@ -136,8 +135,87 @@ fun x y : Z => Z_lt_dec x y
 Arguments Z_lt_ge_dec (x y)%Z_scope
 
 #\\+end_example
-"
-)))))
+")))))
+
+(ert-deftest ob-coq-tests-blog-post ()
+  "Investigate an issue I found while writing a blog post."
+
+  ;; Write `option.org` to a temporary buffer (because simply opening it via
+  ;; `find-file' on a read-only filesystem will leave the buffer in read-only
+  ;; mode and source code evaluation will fail.
+  (let* ((buffer (find-file (concat (getenv "srcdir") "/corpus/option.org")))
+         (text (with-current-buffer buffer (buffer-string)))
+         (org-confirm-babel-evaluate nil))
+    (with-temp-buffer
+      (insert text)
+      (org-mode)
+      (goto-char 213)
+      (org-ctrl-c-ctrl-c)
+      (goto-char 290)
+      (should
+       (looking-at "#\\+RESULTS:
+: 
+: 
+: Option is defined
+: Option_rect is defined
+: Option_ind is defined
+: Option_rec is defined
+: Option_sind is defined"))
+      (goto-char 722)
+      (org-ctrl-c-ctrl-c)
+      (goto-char 752)
+      (should
+       (looking-at "#\\+RESULTS:
+#\\+begin_example
+1 goal
+ *
+  ============================
+  forall x : Option, x <> Fail -> bool
+ *
+1 goal
+ *
+  x : Option
+  ============================
+  Fail <> Fail -> bool
+ *
+#\\+end_example
+"))
+      (goto-char 1028)
+      (org-ctrl-c-ctrl-c)
+      (goto-char 1096)
+      (message "Looking at: %s" (buffer-substring (point) (+ (point) 32)))
+      (should
+       (looking-at "#\\+RESULTS:
+#\\+begin_example
+1 goal
+ *
+  x : Option
+  H : Fail <> Fail
+  ============================
+  bool
+ *
+2 goals
+ *
+  x : Option
+  H : Fail <> Fail
+  ============================
+  Fail <> Fail
+ *
+goal 2 is:
+ Fail = Fail
+ *
+1 goal
+ *
+  x : Option
+  H : Fail <> Fail
+  ============================
+  Fail = Fail
+ *
+No more goals.
+ *
+ *
+#\\+end_example
+")))))
 
 (provide 'ob-coq-tests)
 

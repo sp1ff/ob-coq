@@ -149,14 +149,17 @@ need to be wrapped in a lambda to pass along the session."
 			             line)
 		             (split-string text "\n")))
          (current-state (cdr (assoc key inf-coq--output-alist)))
-         (num-dots (cadr (assoc key inf-coq--output-alist)))
-         (new-text (mapconcat #'identity lines "\n"))
-         (new-num-dots (- num-dots prompts-seen)))
-    (setq current-state
-          (cons
-           new-num-dots
-           (if current-state (concat (cdr current-state) new-text) new-text)))
-    (setf (alist-get key inf-coq--output-alist nil nil 'equal) current-state)
+         (num-newlines (cadr (assoc key inf-coq--output-alist)))
+         (new-text (mapconcat #'identity lines "\n")))
+    (if (not (integerp num-newlines))
+        (message "Warning: inf-coq--preoutput-filter-function invoked for \
+non-existent session %s" session)
+      (let ((new-num-newlines (- num-newlines prompts-seen)))
+        (setq current-state
+              (cons
+               new-num-newlines
+               (if current-state (concat (cdr current-state) new-text) new-text)))
+        (setf (alist-get key inf-coq--output-alist nil nil 'equal) current-state)))
     ;; Return the empty string, so that nothing will be inserted into the buffer
     ""))
 
@@ -219,28 +222,29 @@ the results."
     (unless (> num-dots 0)
       (error "The input is not a sentence in the vernacular; it will produce no output"))
     (let ((text (if (string-suffix-p "\n" text) text (concat text "\n"))))
-      (with-local-quit
-        (let* ((comint-preoutput-filter-functions-orig comint-preoutput-filter-functions)
-               (proc (inf-coq-process session))
-               (key (inf-coq--map-session-internal session))
-               (result))
-          (setf (alist-get key inf-coq--output-alist nil nil 'equal) (cons num-dots ""))
-          (with-current-buffer (process-buffer proc)
-            (add-hook
-             'comint-preoutput-filter-functions
-             (lambda (text)
-               (inf-coq--preoutput-filter-function text session)))
-            (comint-send-string proc text)
-            (let* ((value (cdr (assoc key inf-coq--output-alist))))
-              (while (> (car value) 0)
-                (accept-process-output proc 0.1)
-                (sit-for 0.1)
-                (setq value (cdr (assoc key inf-coq--output-alist))))
-              (setq result (cdr value)))
-            (setf (alist-get key inf-coq--output-alist nil nil 'equal) nil)
-            (setf (alist-get key inf-coq--output-alist nil t 'equal) nil)
-            (setq comint-preoutput-filter-functions comint-preoutput-filter-functions-orig)
-            result))))))
+      (let ((num-newlines (cl-count ?\n text)))
+        (with-local-quit
+          (let* ((comint-preoutput-filter-functions-orig comint-preoutput-filter-functions)
+                 (proc (inf-coq-process session))
+                 (key (inf-coq--map-session-internal session))
+                 (result))
+            (setf (alist-get key inf-coq--output-alist nil nil 'equal) (cons num-newlines ""))
+            (with-current-buffer (process-buffer proc)
+              (add-hook
+               'comint-preoutput-filter-functions
+               (lambda (text)
+                 (inf-coq--preoutput-filter-function text session)))
+              (comint-send-string proc text)
+              (let* ((value (cdr (assoc key inf-coq--output-alist))))
+                (while (> (car value) 0)
+                  (accept-process-output proc 0.1)
+                  (sit-for 0.1)
+                  (setq value (cdr (assoc key inf-coq--output-alist))))
+                (setq result (cdr value)))
+              (setf (alist-get key inf-coq--output-alist nil nil 'equal) nil)
+              (setf (alist-get key inf-coq--output-alist nil t 'equal) nil)
+              (setq comint-preoutput-filter-functions comint-preoutput-filter-functions-orig)
+              result)))))))
 
 (defun inf-coq-quit (&optional session)
   "Quit the Coq process corresponding to SESSION."

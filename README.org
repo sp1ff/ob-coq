@@ -2,7 +2,7 @@
 #+DESCRIPTION: README for ob-coq
 #+AUTHOR: Michael Herstine
 #+EMAIL: sp1ff@pobox.com
-#+DATE: <2024-04-30 Tue 16:02>
+#+DATE: <2024-06-18 Tue 12:53>
 #+AUTODATE: t
 #+STARTUP: overview
 
@@ -46,7 +46,7 @@ to produce an Emacs package file (=ob-coq-0.0.5.tar=) which you can install with
 
 This is early code, something I've tried to indicate through the version number (0.0.x). At the time of this writing, it only supports collecting results as =output= (as opposed to =result=). This reflects what I see as the primary use case for ob-coq: building Coq developments in Org Mode rather than plain Coq (i.e. =.v=) files.
 
-Luc Pellissier maintained the original ob-coq under [[https://git.sr.ht/~bzg/org-contrib/][org-contrib]]. That implementation dependend upon =coq-inferior.el= which used to be part of Coq, but was removed in 2018.
+Luc Pellissier maintained the original ob-coq under [[https://git.sr.ht/~bzg/org-contrib/][org-contrib]]. That implementation depended upon =coq-inferior.el= which used to be part of Coq, but was removed in 2018.
 
 I'm using this package day-in & day-out while I learn Coq and am updating it as I find issues or missing features. Immediate next steps include building-out support for more Org Babel headers as well as hosting tarballs on my personal [[https://www.unwoundstack.com][site]]. When it matures a bit I'd like to submit it to MELPA. Documentation also needs to be written.
 

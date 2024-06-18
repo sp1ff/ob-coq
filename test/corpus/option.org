@@ -1,0 +1,30 @@
+#+TITLE: Option
+#+DESCRIPTION: Test document
+#+PROPERTY: header-args:coq :results output :exports both
+
+Set point to 213 to be inside the following code block:
+
+#+BEGIN_SRC coq :session dmic-2
+  Reset Initial.
+  Inductive Option: Set :=
+  | Fail: Option
+  | Ok: bool -> Option.
+#+END_SRC
+
+Set it to 737 (after evaluating the prior code block) to be inside this one:
+
+#+BEGIN_SRC coq :session dmic-2
+  Definition get: forall x: Option, x <> Fail -> bool.
+    refine
+      (fun x: Option =>
+         match x return x<> Fail -> bool with
+         | Fail => _
+         | Ok b => fun _ => b
+         end).
+#+END_SRC
+
+Finally, set it to 1076 for this one:
+
+#+BEGIN_SRC coq :session dmic-2
+    intros. absurd (Fail = Fail). trivial. reflexivity. Qed.
+#+END_SRC
