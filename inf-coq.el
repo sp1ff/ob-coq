@@ -1,6 +1,6 @@
 ;;; inf-coq.el --- Interaction with inferior Coq processes   -*- lexical-binding: t -*-
 
-;; Copyright (C) 2024 Michael Herstine <sp1ff@pobox.com>
+;; Copyright (C) 2024-2025 Michael Herstine <sp1ff@pobox.com>
 
 ;; Author: Michael Herstine <sp1ff@pobox.com>
 ;; Created: 31 March 2024
