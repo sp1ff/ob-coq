@@ -8,7 +8,7 @@
 ;; Package: inf-coq
 ;; Package-Requires: ((emacs "25.1") (org "9.6"))
 ;; Homepage: https://github.com/sp1ff/ob-coq
-;; Version: 0.0.7
+;; Version: 0.0.8
 
 ;; This file is not part of GNU Emacs.
 

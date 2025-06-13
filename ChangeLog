@@ -1,3 +1,16 @@
+2025-06-12  Michael Herstine  <sp1ff@pobox.com>
+
+	Cut release 0.0.8.
+	This is a hygienic release that:
+
+	    - bumps the version number
+	    - updates the copyrights throughout
+	    - updates the INSTALL file
+
+2025-06-12  Michael Herstine  <sp1ff@pobox.com>
+
+	Updating copyrights & INSTALL
+
 2024-06-18  Michael Herstine  <sp1ff@pobox.com>
 
 	Cutting 0.0.7
