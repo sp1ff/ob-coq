@@ -18,7 +18,14 @@ ob-coq provides [[https://orgmode.org/][Org]] [[https://orgmode.org/worg/org-con
 This code is released under the [[https://www.gnu.org/licenses/gpl-3.0.en.html][GPL version 3]].
 * Pre-requisites
 
-ob-coq requires Emacs, Org Mode & Coq.
+ob-coq requires Emacs, Org Mode & Coq (or its successor, Rocq).
+
+By default, =inf-coq= runs =coqtop=. Rocq 9 doesn't install =coqtop= unless you also install the =coq-core= compatibility package; otherwise, point =inf-coq= at Rocq's own REPL:
+
+#+BEGIN_SRC elisp
+  (setq inf-coq-program-name "rocq"
+        inf-coq-program-args '("repl"))
+#+END_SRC
 * Installation
 
 At present the package is only available as source:
