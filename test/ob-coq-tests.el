@@ -131,7 +131,7 @@ Arguments negb x
       (org-mode)
       (goto-char 263)
       (org-ctrl-c-ctrl-c)
-      (goto-char 318)
+      (goto-char 363)
       (message "Looking at: ``%s''." (buffer-substring (point) (point-max)))
       (should
        (looking-at "#\\+RESULTS:
@@ -139,7 +139,7 @@ Arguments negb x
 : fun x y : Z => Z_lt_dec x y
 : *: forall x y : Z, {(x < y)%Z} \\+ {(x >= y)%Z}
 : *
-: Arguments Z_lt_ge_dec (x y)%Z_scope
+: Arguments Z_lt_ge_dec (x y)%_?Z_scope
 ")))))
 
 
@@ -218,6 +218,19 @@ goal 2 is:
  *
 No more goals.
 #\\+end_example")))))
+
+(ert-deftest ob-coq-tests-session-welcome ()
+  "The welcome message should be stripped in named sessions, too."
+  (unwind-protect
+      (let ((result
+             (org-babel-execute:coq
+              "Check 0."
+              '((:session . "ob-coq-tests-session-welcome")
+                (:result-type . output) (:results . "output")))))
+        (message "Result: ``%s''." result)
+        (should-not (string-match-p "Welcome to" result))
+        (should (string-match-p "^0\n +: nat" result)))
+    (inf-coq-quit "ob-coq-tests-session-welcome")))
 
 (provide 'ob-coq-tests)
 
