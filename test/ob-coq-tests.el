@@ -131,7 +131,8 @@ Arguments negb x
       (org-mode)
       (goto-char 263)
       (org-ctrl-c-ctrl-c)
-      (goto-char 318)
+      (re-search-forward "^#\\+RESULTS")
+      (beginning-of-line)
       (message "Looking at: ``%s''." (buffer-substring (point) (point-max)))
       (should
        (looking-at "#\\+RESULTS:
@@ -139,8 +140,7 @@ Arguments negb x
 : fun x y : Z => Z_lt_dec x y
 : *: forall x y : Z, {(x < y)%Z} \\+ {(x >= y)%Z}
 : *
-: Arguments Z_lt_ge_dec (x y)%Z_scope
-")))))
+: Arguments Z_lt_ge_dec (x y)%_Z_scope")))))
 
 
 
@@ -187,7 +187,8 @@ Arguments negb x
 #\\+end_example"))
       (goto-char 1028)
       (org-ctrl-c-ctrl-c)
-      (goto-char 1086)
+      (re-search-forward "^#\\+RESULTS")
+      (beginning-of-line)
       (message "Looking at: %s" (buffer-substring (point) (+ (point) 312)))
       (should
        (looking-at "#\\+RESULTS:

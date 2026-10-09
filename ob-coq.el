@@ -100,7 +100,7 @@ This function is called by `org-babel-execute-src-block'"
 
 (defun ob-coq--strip-welcome (text)
   "Strip the Coq welcome message from TEXT, if present."
-  (if (string-match "^Welcome to Coq [0-9]+\\.[0-9]+\\.[0-9]+\n" text)
+  (if (string-match "^Welcome to \\(Coq\\|Rocq\\) [0-9]+\\.[0-9]+\\(\\.[0-9]+\\)?\n" text)
       (substring text (match-end 0))
     text))
 

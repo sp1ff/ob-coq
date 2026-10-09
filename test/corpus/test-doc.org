@@ -10,6 +10,6 @@ Set point to 199 to be inside the following code block:
 #+END_SRC
 
 #+BEGIN_SRC coq :results output
-  Require Import ZArith.
+  From Stdlib Require Import ZArith.
   Print Z_lt_ge_dec.
 #+END_SRC
