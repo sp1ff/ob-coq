@@ -187,7 +187,8 @@ Arguments negb x
 #\\+end_example"))
       (goto-char 1028)
       (org-ctrl-c-ctrl-c)
-      (goto-char 1086)
+      (re-search-forward "^#\\+RESULTS")
+      (beginning-of-line)
       (message "Looking at: %s" (buffer-substring (point) (+ (point) 312)))
       (should
        (looking-at "#\\+RESULTS:
