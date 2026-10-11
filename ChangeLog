@@ -1,3 +1,51 @@
+2026-10-10  Michael Herstine  <sp1ff@pobox.com>
+
+	Cut release 0.0.9.
+
+	Hygienic commit.
+	Update copyrights; make a small addition to the README.
+
+2026-10-10  rvs314  <71688932+rvs314@users.noreply.github.com>
+	    Claude Opus 5.5 (1M context)  <noreply@anthropic.com>
+	    Michael Herstine  <sp1ff@pobox.com>
+
+	Support Rocq 9 (#3)
+	* Support Rocq 9, and strip the welcome message in sessions.
+
+	This commit updates ob-coq for Rocq 9 and fixes a related bug:
+
+	    1) `ob-coq--strip-welcome' now recognizes Rocq 9's banner
+	       ("Welcome to Rocq 9.2"), which uses a different name and a
+	       two-part version number
+	    2) the welcome message is now stripped for every new process,
+	       not only for blocks without a `:session'; previously the first
+	       result in a named session began with the banner (this also
+	       affected Coq 8, but was masked once any session-less block had
+	       run, since the hook is added globally)
+
+	The tests are updated accordingly: the ZArith block in the corpus
+	silences Rocq 9's deprecation warning for the unqualified `Require',
+	`ob-coq-tests-issue-2' accepts both `%Z_scope' and `%_Z_scope', and
+	the new `ob-coq-tests-session-welcome' covers the session fix.
+
+	To use Rocq 9 without the coqtop compatibility package, set
+	`inf-coq-program-name' to "rocq" and `inf-coq-program-args' to
+	("repl").
+
+	Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+
+	* Document how to run ob-coq with Rocq 9.
+
+	Rocq 9 doesn't install `coqtop' unless the `coq-core' compatibility
+	package is also installed, so the default `inf-coq-program-name'
+	fails. The README now says how to use `rocq repl' instead.
+
+	Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+
+	* Minor change to ob-coq-tests-blog-post to make it more robust
+
+	---------
+
 2025-06-12  Michael Herstine  <sp1ff@pobox.com>
 
 	Cut release 0.0.8.

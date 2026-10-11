@@ -8,3 +8,6 @@ to Org Mode.
 
 Thanks to Luc Pellissier <luc.pellissier@crans.org>, the maintainer of
 the original ob-coq.el.
+
+Thanks to rvs314 <https://github.com/rvs314> for adding support for
+Rocq 9.

@@ -2,6 +2,9 @@ ob-coq News -- history of user-visible changes           -*- outline -*-
 
 * 0.0 builds
 
+** 0.0.9 build
+
+Add support for Rocq 9.
 ** 0.0.8 build
 
 No user-visible changes or bugfixes-- just updated copyrights.
