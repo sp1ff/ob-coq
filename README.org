@@ -2,7 +2,7 @@
 #+DESCRIPTION: README for ob-coq
 #+AUTHOR: Michael Herstine
 #+EMAIL: sp1ff@pobox.com
-#+DATE: <2025-06-12 Thu 20:22>
+#+DATE: <2026-10-10 Sat 19:26>
 #+AUTODATE: t
 #+STARTUP: overview
 
@@ -28,7 +28,7 @@ By default, =inf-coq= runs =coqtop=. Rocq 9 doesn't install =coqtop= unless you 
 #+END_SRC
 * Installation
 
-At present the package is only available as source:
+I've not yet submitted this to [[https://melpa.org/#/][melpa]]; I host the package at my personal [[https://www.unwoundstack.com/distros.html][site]], or you can install from source:
 
 #+BEGIN_SRC bash
   git clone git@github.com:sp1ff/ob-coq.git
