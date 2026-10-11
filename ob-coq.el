@@ -99,8 +99,8 @@ This function is called by `org-babel-execute-src-block'"
 			                    (cdr (assq :rownames params))))))
 
 (defun ob-coq--strip-welcome (text)
-  "Strip the Coq welcome message from TEXT, if present."
-  (if (string-match "^Welcome to Coq [0-9]+\\.[0-9]+\\.[0-9]+\n" text)
+  "Strip the Coq (or Rocq) welcome message from TEXT, if present."
+  (if (string-match "^Welcome to \\(?:Coq\\|Rocq\\) [0-9]+\\(?:\\.[0-9]+\\)*\n" text)
       (substring text (match-end 0))
     text))
 
@@ -109,11 +109,11 @@ This function is called by `org-babel-execute-src-block'"
   "Evaluate BODY as Coq code in session SESSION."
 
   (let ((proc (inf-coq-process session)))
-    (unless proc (inf-coq-run-coq session))
-    (unless session
+    (unless proc
+      (inf-coq-run-coq session)
+      ;; The welcome message arrives with the first output of a new process,
+      ;; whether or not it belongs to a named session.
       (with-current-buffer (process-buffer (inf-coq-process session))
-        ;; The buffer (and process) will be killed on completion, so no need to
-        ;; remove later
         (add-hook 'comint-preoutput-filter-functions #'ob-coq--strip-welcome -99)))
     (let ((result (inf-coq-send-string body session)))
       (unless session (inf-coq-quit))
